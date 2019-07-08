@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Text.RegularExpressions;  
+using System.Text.RegularExpressions;
 
 namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
 {
     class Program
     {
+        const int failed = -1;
         static void Main(string[] args)
         {
             Test("42*47=1?74", 9);
@@ -23,74 +24,72 @@ namespace Tavisca.Bootcamp.LanguageBasics.Exercise1
 
         public static int FindDigit(string equation)
         {
-            // Console.WriteLine(equation);
-            var op1 = Regex.Split(equation, @"[*,=]");
-            var re_op = "";
-            // Console.WriteLine(op1[0]);
-            // Console.WriteLine(op1[1]);
-            // Console.WriteLine(op1[2]);
+            var operators = Regex.Split(equation, @"[*,=]");
+            var computeValue = "";
             string ans = "";
-            // if op1 and op2 both do not contain ?
+            const string questionMark = "?";
 
-            if(op1[0].Contains("?") )
+            if (operators[0].Contains(questionMark))
             {
-                // Console.WriteLine("op1  contains ?");
-                
-                // System.Console.WriteLine(Int32.Parse(op1[2]) / Int32.Parse(op1[1]));
-                ans = (Double.Parse(op1[2]) / Double.Parse(op1[1])).ToString();
-                // System.Console.WriteLine(op1[0].IndexOf("?"));
-                // System.Console.WriteLine(ans[0]);
-
-                re_op = op1[0].Replace( '?' , ans[op1[0].IndexOf("?")] );
-                
-                if(ans.Equals(re_op)){
-                    var x =  ans[op1[0].IndexOf("?")];
-                    // Console.WriteLine(result);
-                    return Int16.Parse(x.ToString());
-                }else{
-                    return -1;
-                }
+                return SolveForFirstOperand(operators, out computeValue, out ans, questionMark);
             }
-            else if( op1[1].Contains("?"))
+            else if (operators[1].Contains(questionMark))
             {
-                // Console.WriteLine("op2  contains ?");
-                // System.Console.WriteLine(Int32.Parse(op1[2]) / Int32.Parse(op1[0]));
-                ans = (Double.Parse(op1[2]) / Double.Parse(op1[0])).ToString();
-                // System.Console.WriteLine(op1[1].IndexOf("?"));
-                // System.Console.WriteLine(ans[0]);
-
-                re_op = op1[1].Replace( '?' , ans[op1[1].IndexOf("?")] );
-                
-                if(ans.Equals(re_op)){
-                    var x =  ans[op1[1].IndexOf("?")];
-                    // Console.WriteLine(result);
-                    return Int16.Parse(x.ToString());
-                }else{
-                    return -1;
-                }
+                return SolveForSecondOperand(operators, out computeValue, out ans, questionMark);
             }
-            else{
-                // Console.WriteLine("op3  contains ?");
-                // System.Console.WriteLine(Int32.Parse(op1[2]) / Int32.Parse(op1[1]));
-                ans = (Double.Parse(op1[0]) * Double.Parse(op1[1])).ToString();
-                // Console.WriteLine(op1[1].IndexOf("?"));
-                // System.Console.WriteLine(ans[0]);
-
-                re_op = op1[2].Replace( '?' , ans[op1[2].IndexOf("?")] );
-                
-                if(ans.Equals(re_op)){
-                    var x =  ans[op1[2].IndexOf("?")];
-                    // Console.WriteLine(result);
-                    return Int16.Parse(x.ToString());
-                }else{
-                    return -1;
-                }
-
-                
+            else
+            {
+                return SolveForThirdOperand(operators, out computeValue, out ans, questionMark);
             }
 
         }
 
-       
+        private static int SolveForThirdOperand(string[] operators, out string computeValue, out string ans, string questionMark)
+        {
+            ans = (Double.Parse(operators[0]) * Double.Parse(operators[1])).ToString();
+            computeValue = operators[2].Replace('?', ans[operators[2].IndexOf(questionMark)]);
+
+            if (ans.Equals(computeValue))
+            {
+                var missingValue = ans[operators[2].IndexOf(questionMark)];
+                return Int16.Parse(missingValue.ToString());
+            }
+            else
+            {
+                return failed;
+            }
+        }
+
+        private static int SolveForSecondOperand(string[] operators, out string computeValue, out string ans, string questionMark)
+        {
+            ans = (Double.Parse(operators[2]) / Double.Parse(operators[0])).ToString();
+            computeValue = operators[1].Replace('?', ans[operators[1].IndexOf(questionMark)]);
+
+            if (ans.Equals(computeValue))
+            {
+                var missingValue = ans[operators[1].IndexOf(questionMark)];
+                return Int16.Parse(missingValue.ToString());
+            }
+            else
+            {
+                return failed;
+            }
+        }
+
+        private static int SolveForFirstOperand(string[] operators, out string computeValue, out string ans, string questionMark)
+        {
+            ans = (Double.Parse(operators[2]) / Double.Parse(operators[1])).ToString();
+            computeValue = operators[0].Replace('?', ans[operators[0].IndexOf(questionMark)]);
+
+            if (ans.Equals(computeValue))
+            {
+                var missingValue = ans[operators[0].IndexOf(questionMark)];
+                return Int16.Parse(missingValue.ToString());
+            }
+            else
+            {
+                return failed;
+            }
+        }
     }
 }
